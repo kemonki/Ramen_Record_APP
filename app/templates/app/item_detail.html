@@ -1,0 +1,16 @@
+{% extends "./_base.html" %}
+{% block content %}
+<div class="container-fluid bg-secondary text-white">
+    <div class="container bg-light text-dark">
+        <h2 class="text-center">詳細表示</h2>
+        <!--  -->
+        {% include "./item_detail_contents.html" %}
+        <div class="row">
+            <div class="col-12 d-flex justify-content-end">
+                <a class="btn btn-dark" href="{% url 'index' %}">戻る</a>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

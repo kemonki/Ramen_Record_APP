@@ -1,0 +1,38 @@
+{% load item_extras %}
+<ul class="pagination">
+
+    <!-- 前へ の部分 -->
+    {% if page_obj.has_previous %}
+        <li class="page-item pagination-prev">
+            <a class="page-link" href="?{% url_replace request 'page' page_obj.previous_page_number %}">&laquo;</a>
+        </li>
+    {% else %}
+        <li class="page-item disabled pagination-prev">
+            <span class="page-link">&laquo;</span>
+        </li>
+    {% endif %}
+
+    <!-- 数字の部分 -->
+    {% for page in paginator.page_range %}
+        {% if page == page_obj.number %}
+            <li class="page-item active">
+                <span class="page-link">{{ page }} <span class="sr-only">(current)</span></span>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?{% url_replace request 'page' page %}">{{ page }}</a>
+            </li>
+        {% endif %}
+    {% endfor %}
+
+     <!-- 次へ の部分 -->
+    {% if page_obj.has_next %}
+        <li class="page-item pagination-next">
+            <a class="page-link" href="?{% url_replace request 'page' page_obj.next_page_number %}">&raquo;</a>
+        </li>
+    {% else %}
+        <li class="page-item disabled pagination-next">
+            <span class="page-link ">&raquo;</span>
+        </li>
+    {% endif %}
+</ul>
