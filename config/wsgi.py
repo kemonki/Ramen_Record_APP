@@ -8,9 +8,10 @@ https://docs.djangoproject.com/en/2.0/howto/deployment/wsgi/
 """
 
 import os
-
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Ramen_Record_APP.config.settings")
+# この環境変数を設定しておくと、Djangoの設定がプロジェクト内の`settings.py`を参照します。
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
+# WSGIアプリケーションを取得
 application = get_wsgi_application()
