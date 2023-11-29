@@ -1,2 +1,2 @@
-python-3.11.3
+Python-3.12.0
 django-filter-23.3
