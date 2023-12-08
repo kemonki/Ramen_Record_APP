@@ -1,2 +1,0 @@
-web: gunicorn app.wsgi && python manage.py collectstatic --noinput
-
