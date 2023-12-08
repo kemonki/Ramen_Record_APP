@@ -13,9 +13,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import dj_database_url
 
-
-
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -28,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
@@ -50,7 +47,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middlewware.WhiteNoiseMiddleware',
+    #'whitenoise.middlewware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -84,12 +81,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'name',
-        'USER': 'user',
-        'PASSWORD': '',
-        'HOST': 'host',
-        'PORT': '',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # 'NAME': 'name',
+        # 'USER': 'user',
+        # 'PASSWORD': '',
+        # 'HOST': 'host',
+        # 'PORT': '',
     }
 }
 
@@ -127,7 +124,7 @@ USE_TZ = True
 
 
 #画像格納設定,CSS設定
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
 STATIC_ROOT= BASE_DIR + "/staticfiles"
 
@@ -213,10 +210,28 @@ try:
 except ImportError:
     pass
 
+DEBUG = False
+
 if not DEBUG:
-    SECRET_KEY = os.environ['SECRET_KEY']
+    # import os
     import django_heroku
+
+    SECRET_KEY = os.environ['SECRET_KEY']
+
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATIC_URL = '/static/'
+
+    STATICFILES_DIRS = (
+        [os.path.join(BASE_DIR, 'static')]
+    )
+
+    MIDDLEWARE += [
+        # 'whitenoise.middlewware.WhiteNoiseMiddleware',
+    ]
+
     django_heroku.settings(locals())
 
-    db_fron_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
-    DATABASE['Default'].update(db_fron_env)
+    # db_fron_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    # DATABASE['Default'].update(db_fron_env)
