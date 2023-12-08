@@ -129,7 +129,7 @@ USE_TZ = True
 #画像格納設定,CSS設定
 STATIC_URL = '/static/'
 
-STATIC_ROOT= BASE_DIR / "staticfiles"
+STATIC_ROOT= BASE_DIR + "/staticfiles"
 
 STATIC_DIRS = [os.path.join(BASE_DIR, 'static')]
 
