@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店舗検索</title>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>店舗検索</h1>
+    <form id="search-form">
+        <label for="latitude">Latitude:</label>
+        <input type="text" id="latitude" name="latitude" required><br>
+        <label for="longitude">Longitude:</label>
+        <input type="text" id="longitude" name="longitude" required><br>
+        <label for="keyword">Keyword:</label>
+        <input type="text" id="keyword" name="keyword"><br>
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="map"></div>
+
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -34.397, lng: 150.644},
+                zoom: 15
+            });
+
+            document.getElementById('search-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                var latitude = parseFloat(document.getElementById('latitude').value);
+                var longitude = parseFloat(document.getElementById('longitude').value);
+                var keyword = document.getElementById('keyword').value;
+
+                var url = '/search/?latitude=' + latitude + '&longitude=' + longitude + '&keyword=' + encodeURIComponent(keyword);
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('Error: ' + data.error);
+                        } else {
+                            cosole.log("テスト")
+                            data.results.forEach(place => {
+                                var marker = new google.maps.Marker({
+                                    position: {lat: place.geometry.location.lat, lng: place.geometry.location.lng},
+                                    map: map,
+                                    title: place.name
+                                });
+
+                                var infowindow = new google.maps.InfoWindow({
+                                    content: '<h3>' + place.name + '</h3>' +
+                                             '<p>' + place.vicinity + '</p>'
+                                });
+
+                                marker.addListener('click', function() {
+                                    infowindow.open(map, marker);
+                                });
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"></script>
+</body>
+</html>
