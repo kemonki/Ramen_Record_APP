@@ -25,53 +25,97 @@
 
     <div id="map"></div>
 
-    <script>
-        function initMap() {
-            var map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: -34.397, lng: 150.644},
-                zoom: 15
-            });
+<script>
+var map;
+var service;
+var infowindow;
 
-            document.getElementById('search-form').addEventListener('submit', function(event) {
-                event.preventDefault();
 
-                var latitude = parseFloat(document.getElementById('latitude').value);
-                var longitude = parseFloat(document.getElementById('longitude').value);
-                var keyword = document.getElementById('keyword').value;
+//地図表示
+function initMap()  {
+  map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 15,
+  });
 
-                var url = '/search/?latitude=' + latitude + '&longitude=' + longitude + '&keyword=' + encodeURIComponent(keyword);
+  infowindow = new google.maps.InfoWindow();
 
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            alert('Error: ' + data.error);
-                        } else {
-                            cosole.log("テスト")
-                            data.results.forEach(place => {
-                                var marker = new google.maps.Marker({
-                                    position: {lat: place.geometry.location.lat, lng: place.geometry.location.lng},
-                                    map: map,
-                                    title: place.name
-                                });
+  // フォームサブミットイベントリスナーを追加
+  document.getElementById('search-form').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-                                var infowindow = new google.maps.InfoWindow({
-                                    content: '<h3>' + place.name + '</h3>' +
-                                             '<p>' + place.vicinity + '</p>'
-                                });
+    var latitude = parseFloat(document.getElementById('latitude').value);
+    var longitude = parseFloat(document.getElementById('longitude').value);
 
-                                marker.addListener('click', function() {
-                                    infowindow.open(map, marker);
-                                });
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            });
+    //LatLngクラスは座標位置を表すためのクラス
+    var location = new google.maps.LatLng(latitude, longitude);
+
+    map.setCenter(location);
+
+    var request = {
+      location: location,
+      radius: '500', // 500メートル以内の検索
+      query: document.getElementById('keyword').value
+    };
+
+    service = new google.maps.places.PlacesService(map);
+    service.textSearch(request, function(results, status) {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        for (var i = 0; i < results.length; i++) {
+          createMarker(results[i]);
         }
-    </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"></script>
+      }
+    });
+  });
+
+  // マーカーがクリックされたときの処理を定義
+  function createMarker(place) {
+    var marker = new google.maps.Marker({
+      map: map,
+      position: place.geometry.location,
+      name: place.name,
+      formatted_address: place.formatted_address,
+      formatted_phone_number: place.formatted_phone_number,
+      website: place.website,
+      opening_hours: place.opening_hours,
+      photos: place.photos,
+    });
+
+    google.maps.event.addListener(marker, 'click', function() {
+      // クリックされたマーカーに関連付けられている場所の Place ID を取得
+      var placeId = place.place_id;
+
+      // Place ID を使用して詳細情報を取得
+      getPlaceDetails(placeId);
+    });
+  }
+
+  // Place ID を使用して詳細情報を取得する関数
+  function getPlaceDetails(placeId) {
+    var request = {
+        placeId: placeId,
+        fields: ['name', 'formatted_address', 'formatted_phone_number', 'website', 'opening_hours', 'photos']
+    };
+
+    var service = new google.maps.places.PlacesService(map);
+    service.getDetails(request, callback);
+  }
+
+  // Place Details リクエストのコールバック関数
+  function callback(place, status) {
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+        console.log(place);
+        console.log('Place Name:', place.name);
+        console.log('Address:', place.formatted_address);
+        console.log('Phone Number:', place.formatted_phone_number);
+        console.log('Website:', place.website);
+        console.log('Opening Hours:', place.opening_hours);
+        console.log('Photos:', place.photos);
+    }
+  }
+}
+</script>
+
+</script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=apiキー&callback=initMap&libraries=places"></script>
 </body>
 </html>
