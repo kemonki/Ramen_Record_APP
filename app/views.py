@@ -7,12 +7,37 @@ from django.utils import timezone
 from django.views.generic import ListView,DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.db.models import Q
-
-
 from .filters import ItemFilterSet
 from .forms import ItemForm
 from .models import Item
+from django.shortcuts import render
 
+#Geocoding API を使用する際のモジュール設定
+from django.http import JsonResponse
+import googlemaps
+from django.shortcuts import render
+
+# 現在地より800m圏内のラーメン店舗情報を表示する
+def geocode_address_view(request):
+    return render(request, 'geocode_template.html')
+
+# アプリケーションのルーティング設定
+def render_search_view(request):
+    return render(request, 'search_form.html')
+
+def search_results_view(request):
+    return render(request, 'search_results.html')
+
+def search_view(request):
+    query = request.GET.get('q')
+    results = []
+
+    if query:
+        # クエリが空でない場合の処理
+        # 例: モデルから検索を実行し、結果をresultsに追加する
+        results = Item.objects.filter(name__icontains=query)  # nameは適切なフィールドに置き換える
+
+    return render(request, 'search_results.html', {'results': results})
 
 # 未ログインのユーザーにアクセスを許可する場合は、LoginRequiredMixinを継承から外してください。
 #
@@ -76,8 +101,6 @@ class ItemFilterView(LoginRequiredMixin, FilterView):
         context = super().get_context_data(**kwargs)
         context['filter'] = self.filterset_class(self.request.GET, queryset=self.get_queryset())
         return context
-    
-
 
 class ItemDetailView(LoginRequiredMixin, DetailView):
     """
@@ -151,6 +174,7 @@ class ItemDeleteView(LoginRequiredMixin, DeleteView):
         item.delete()
 
         return HttpResponseRedirect(self.success_url)
+    
 
 #Geocoding APIの住所を地理座標に変換するための関数
     
@@ -172,3 +196,5 @@ def geocode_address(request):
         return JsonResponse({'error': 'Invalid request method'})
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
