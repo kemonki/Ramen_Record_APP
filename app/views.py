@@ -152,4 +152,23 @@ class ItemDeleteView(LoginRequiredMixin, DeleteView):
 
         return HttpResponseRedirect(self.success_url)
 
+#Geocoding APIの住所を地理座標に変換するための関数
+    
+def geocode_address(request):
+    if request.method == 'GET':
+        address = request.GET.get('address', '')
+        api_key = os.environ.get('GOOGLE_MAPS_API_KEY')
+        if api_key:
+            gmaps = googlemaps.Client(key=api_key)
+            geocode_result = gmaps.geocode(address)
+            if geocode_result:
+                lat_lng = geocode_result[0]['geometry']['location']
+                return JsonResponse({'latitude': lat_lng['lat'], 'longitude': lat_lng['lng']})
+            else:
+                return JsonResponse({'error': 'Invalid address'})
+        else:
+            return JsonResponse({'error': 'API key not found'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
