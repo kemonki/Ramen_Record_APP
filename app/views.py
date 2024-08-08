@@ -28,16 +28,7 @@ def render_search_view(request):
 def search_results_view(request):
     return render(request, 'search_results.html')
 
-def search_view(request):
-    query = request.GET.get('q')
-    results = []
 
-    if query:
-        # クエリが空でない場合の処理
-        # 例: モデルから検索を実行し、結果をresultsに追加する
-        results = Item.objects.filter(name__icontains=query)  # nameは適切なフィールドに置き換える
-
-    return render(request, 'search_results.html', {'results': results})
 
 # 未ログインのユーザーにアクセスを許可する場合は、LoginRequiredMixinを継承から外してください。
 #
